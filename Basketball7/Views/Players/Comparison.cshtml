@@ -1,0 +1,281 @@
+@model Basketball7.Models.CompareViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2 style="margin-top:75px;">Compare Players and Seasons</h2>
+<div layout="row">
+    <div class="dropdown" layout-padding>
+        <button class="btn btn-primary dropdown-toggle" type="button" onselect="myFunction()" data-toggle="dropdown">
+            <span id="selectPositionText">Select Position</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            @foreach (var position in Model.Positions)
+            {
+                <li><a href="#" onclick="selectPosition('@position')">@position</a></li>
+            }
+        </ul>
+    </div>
+    <div class="dropdown" layout-padding>
+        <button class="btn btn-primary dropdown-toggle" type="button" onselect="myFunction()" data-toggle="dropdown">
+            <span id="selectPlayerText">Select Player</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" id="playersDropDown"></ul>
+    </div>
+
+    <div class="dropdown" layout-padding>
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+            <span id="selectSeasonText">Select Season</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" id="seasonDropDown"></ul>
+    </div>
+    <div layout-padding>
+        <button class="btn btn-success" type="button" onclick="addSeason()">
+            Add to Comparison List
+        </button>
+    </div>
+    <div layout-padding>
+        <button class="btn btn-error" type="button" onclick="RemoveSeasons()">
+            Clear All
+        </button>
+    </div>
+</div>
+<hr />
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                Image
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Season
+            </th>
+            <th>
+                Team
+            </th>
+            <th>
+                OR
+            </th>
+            <th>
+                DR
+            </th>
+            <th>
+                REB
+            </th>
+            <th>
+                Assists
+            </th>
+            <th>
+                Blocks
+            </th>
+            <th>
+                Steals
+            </th>
+            <th>
+                Fouls
+            </th>
+            <th>
+                TO
+            </th>
+            <th>
+                Points
+            </th>
+        </tr>
+    </thead>
+    <tbody id="seasonTableBody"></tbody>
+</table>
+<script>
+    var viewModel = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model) as String);
+    var selectedPlayer = new Object();
+    var selectedSeason = new Object();
+    var selectedPosition = new Object();
+    function selectPosition(positionName) {
+        var playersDropDown = document.getElementById("playersDropDown");
+        playersDropDown.innerHTML = "";
+        for (i = 0; i < viewModel.Players.length; i++) {
+            var playername = viewModel.Players[i].Player.Name;
+            var position = viewModel.Players[i].Player.Position;
+            document.getElementById('selectPositionText').innerHTML = position;
+            selectedPosition = position;
+            if (position == positionName) {
+                var listItem = document.createElement("LI");
+                var listItemA = document.createElement("a");
+                listItemA.innerHTML = playername;
+                listItemA.addEventListener("click", function (e) {
+                    selectPlayer(e.target.innerHTML);
+                });
+                listItem.appendChild(listItemA);
+                playersDropDown.appendChild(listItem);
+            }
+        }
+    }
+    function selectPlayer(playerName) {
+        selectedPlayer = playerName;
+        document.getElementById('selectPlayerText').innerHTML = playerName;
+
+        //get player and seasons
+        var seasonsDropDown = document.getElementById("seasonDropDown");
+        seasonsDropDown.innerHTML = "";
+
+        //find the player (loop not optimal), normally would use lnq
+        for (i = 0; i < viewModel.Players.length; i++) {
+            var playername = viewModel.Players[i].Player.Name;
+            if (playername == playerName) {
+                //found the player, load seasons
+
+                for (var j = 0; j < viewModel.Players[i].Seasons.length; j++) {
+                    var seasonName = viewModel.Players[i].Seasons[j].SEASON;
+                    var listItem = document.createElement("LI");
+                    var listItemA = document.createElement("a");
+                    listItemA.innerHTML = seasonName;
+                    listItemA.addEventListener("click", function (e) {
+                        selectSeason(e.target.innerHTML);
+                    });
+                    listItem.appendChild(listItemA);
+                    seasonsDropDown.appendChild(listItem);
+                }
+                break;
+            }
+        }
+    }
+    function selectSeason(seasonName) {
+        selectedSeason = seasonName;
+        var element = document.getElementById('selectSeasonText');
+        element.innerHTML = seasonName;
+    }
+    //when this variable is 0, the next table added will be marked
+    var baseSeasonMarker = 0;
+    var baseSeason = new Object();
+    function addSeason() {
+        //get the data from the dropdown menus
+        //find the selected season () //could be storing object instead of string to make selection more potable.
+        //would make more sense as a datacontext in angular or JSON objects with display paths
+        //var playerandseason = viewModel.Players[0];
+        var player = getPlayer(selectedPlayer);
+        var season = getSeason(selectedPlayer, selectedSeason);
+        if (baseSeasonMarker == 0) {
+            //set the base to compare against (may be added to UI later)
+            baseSeason = season;
+        }
+
+        //need a table
+        var tablebody = document.getElementById('seasonTableBody');
+        var tableRow = document.createElement('tr');
+        if (baseSeasonMarker == 0) {
+            tableRow.style = 'font-weight:bold;';
+            baseSeason = season;
+            //mark that the table row (to bold the first row, when seasonmarker is 0)
+            baseSeasonMarker++;
+        }
+
+        //would be nice to have react.js or a property iterator framework here to automate this
+        var image = document.createElement('td');
+        var imagesub = document.createElement('img');
+        imagesub.src = player.ImageUrl;
+        imagesub.height = 60;
+        image.appendChild(imagesub);
+        tableRow.appendChild(image);
+
+        //name
+        var td = document.createElement('td');
+        td.innerHTML = player.Name;
+        tableRow.appendChild(td);
+
+        //season
+        var seasonName = document.createElement('td');
+        seasonName.innerHTML = season.SEASON;
+        tableRow.appendChild(seasonName);
+
+        //faster way to do this possible, can get down to one line of code
+        attachToTable(tableRow, season.TEAM);
+        var diff = season.OR - baseSeason.OR;
+        attachToTableDiff(tableRow, season.OR, diff);
+        diff = season.DR - baseSeason.DR;
+        attachToTableDiff(tableRow, season.DR, diff);
+        diff = season.REB - baseSeason.REB;
+        attachToTableDiff(tableRow, season.REB, diff);
+        diff = season.AST - baseSeason.AST;
+        attachToTableDiff(tableRow, season.AST, diff);
+        diff = season.BLK - baseSeason.BLK;
+        attachToTableDiff(tableRow, season.BLK, diff);
+        diff = season.STL - baseSeason.STL;
+        attachToTableDiff(tableRow, season.STL, diff);
+        diff = season.PF - baseSeason.PF;
+        attachToTableDiff(tableRow, season.PF, diff);
+        diff = season.TO - baseSeason.TO;
+        attachToTableDiff(tableRow, season.TO, diff);
+        diff = season.PTS - baseSeason.PTS;
+        attachToTableDiff(tableRow, season.PTS, diff);
+
+        tablebody.appendChild(tableRow);
+      
+    }
+    //method to help create table items faster
+    function attachToTableDiff(tableRow, text, diff) {
+
+        var td = document.createElement('td');
+        if (diff > 0) {
+            var stat = document.createElement('span');
+            stat.innerHTML = text;
+            var difference = document.createElement('span');
+            difference.innerHTML = '<b> (' + diff + ')</b>';
+            difference.style = 'color:green;';
+            td.appendChild(stat);
+            td.appendChild(difference);
+        }
+        else if (diff < 0) {
+            var stat = document.createElement('span');
+            stat.innerHTML = text;
+            var difference = document.createElement('span');
+            difference.innerHTML = '<b> (' + diff + ')</b>';
+            difference.style = 'color:red;';
+            td.appendChild(stat);
+            td.appendChild(difference);
+        }
+        else {
+            td.innerHTML = text;
+        }
+        tableRow.appendChild(td);
+    }
+    function attachToTable(tableRow, text) {
+
+        var td = document.createElement('td');
+        td.innerHTML = text;
+        tableRow.appendChild(td);
+    }
+    function getPlayer(playerName) {
+        for (var i = 0; i < viewModel.Players.length; i++) {
+            var player = viewModel.Players[i];
+            if (player.Player.Name == playerName) {
+                return player.Player;
+            }
+        }
+    }
+    function getSeason(playerName, seasonName) {
+        for (var i = 0; i < viewModel.Players.length; i++) {
+            var player = viewModel.Players[i];
+            if (player.Player.Name == playerName) {
+                for (var j = 0; j < player.Seasons.length; j++) {
+                    if (player.Seasons[j].SEASON == seasonName) {
+                        return player.Seasons[j];
+                    }
+                }
+                return player;
+            }
+        }
+    }
+    function RemoveSeasons() {
+        var tablebody = document.getElementById('seasonTableBody');
+        tablebody.innerHTML = "";
+        baseSeasonMarker = 0;
+
+    }
+
+</script>

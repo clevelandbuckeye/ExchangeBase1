@@ -1,0 +1,107 @@
+@model Basketball7.Models.CompareViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2 style="margin-top:75px;">Career Stats</h2>
+
+<p>
+    <a asp-action="Create">Add Player</a>
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                Image
+            </th>
+            <th>
+                Name
+            </th>
+            @*<th>
+                Season
+            </th>*@
+            @*<th>
+                Team
+            </th>*@
+            <th>
+                OR
+            </th>
+            <th>
+                DR
+            </th>
+            <th>
+                REB
+            </th>
+            <th>
+                Assists
+            </th>
+            <th>
+                Blocks
+            </th>
+            <th>
+                Steals
+            </th>
+            <th>
+                Fouls
+            </th>
+            <th>
+                TO
+            </th>
+            <th>
+                Points
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Players)
+        {
+            <tr>
+                <td>
+                   <img height="60" src="@Html.DisplayFor(modelItem =>item.Player.ImageUrl)"/>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Player.Name)
+                </td>
+                @*<td>
+                    @Html.DisplayFor(modelItem => item.Career.SEASON)
+                </td>*@
+                @*<td>
+                    @Html.DisplayFor(modelItem => item.Career.TEAM)
+                </td>*@
+                <td>
+                    @Html.DisplayFor(modelItem => item.Career.OR)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Career.DR)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Career.REB)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Career.AST)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Career.BLK)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Career.STL)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Career.PF)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Career.TO)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Career.PTS)
+                </td>
+                <td>
+                    @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

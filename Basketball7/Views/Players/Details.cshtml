@@ -1,0 +1,162 @@
+@model Basketball7.Models.Player
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>@Html.DisplayFor(model => model.Name)</h4>
+    <img height="100" src="@Html.DisplayFor(model => model.ImageUrl)" />
+    @*<hr />*@
+    <dl style="margin-left:-125px;" class="dl-horizontal" style="text-align:left;">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Jersey)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Jersey)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Age)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Age)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Height)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Height)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Weight)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Weight)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.HighSchool)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.HighSchool)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.College)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.College)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DraftYear)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DraftYear)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Position)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Position)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+<hr />
+<h4>Seasons</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                Season
+            </th>
+            <th>
+                Team
+            </th>
+            <th>
+                OR
+            </th>
+            <th>
+                DR
+            </th>
+            <th>
+                REB
+            </th>
+            <th>
+                Assists
+            </th>
+            <th>
+                Blocks
+            </th>
+            <th>
+                Steals
+            </th>
+            <th>
+                Fouls
+            </th>
+            <th>
+                TO
+            </th>
+            <th>
+                Points
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Season season in Model.Seasons)
+        {
+            string style = season.SEASON == "Career" ? "font-weight:Bold;" : null;
+            <tr style="@style">
+                <td>
+                    @Html.DisplayFor(modelItem => season.SEASON)
+                </td>
+                <td>
+
+                    @Html.DisplayFor(modelItem => season.TEAM)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => season.OR)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => season.DR)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => season.REB)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => season.AST)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => season.BLK)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => season.STL)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => season.PF)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => season.TO)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => season.PTS)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@season.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@season.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@season.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
